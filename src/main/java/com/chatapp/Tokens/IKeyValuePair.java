@@ -1,5 +1,6 @@
 package com.chatapp.Tokens;
 
-public interface IKeyValuePair {
-
+public interface IKeyValuePair<K,V> {
+    public K getKey();
+    public V getValue();
 }
