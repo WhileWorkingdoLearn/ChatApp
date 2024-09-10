@@ -30,12 +30,21 @@ ADMIN,
 
 public class App 
 {
+     /*
+             * This app provides an rest entpoint for userAuthentification. If user is authenticatet and authorized a oneTime sessionId / token is send back to user.
+             * The Client than can acces the websocket with this sessionId and establish a connection. 
+             */
 
     public static void main( String[] args )
     {
         System.out.println( "Hello World!" );
-
+        
+            /*This needs to be replaced by a session container with background working thread invalid tokens needs to be deleted. 
+            Also protection against token spaming is needed.
+            Further question is, to allow to have a user multiple Websocket sessions. -> multiple clients etc.
+            */
             ConcurrentHashMap<String,UserToken> sessionIds = new ConcurrentHashMap<String,UserToken>();
+
             var sessionHandler = new ISessionHandler() {
 
                 @Override
@@ -55,7 +64,7 @@ public class App
                 
             };
 
-            var authService = new AuthService(Algorithm.HMAC256(/*Needs to be put into a variable */ "TestSecret"));
+            var authService = new AuthService(Algorithm.HMAC256(/*Needs to be put into a variable or otherwise recived*/ "TestSecret"));
 
             var restController = new RestController(authService,sessionHandler);
 
@@ -69,6 +78,7 @@ public class App
             .post("/user",restController::postUser)
             .start(7070);
 
+            /* to establish a connection for the websocket a sessionid received from token is required */
             app.ws("/chat/{id}",websocket -> {
                 websocket.onConnect(websocketController::connectUser);
                 websocket.onClose(websocketController::disconnectUser);
