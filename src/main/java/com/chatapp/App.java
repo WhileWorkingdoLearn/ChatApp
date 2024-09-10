@@ -1,7 +1,7 @@
 package com.chatapp;
 
+import java.util.concurrent.ConcurrentHashMap;
 
-import org.slf4j.event.KeyValuePair;
 
 import com.auth0.jwt.algorithms.Algorithm;
 
@@ -10,6 +10,9 @@ import com.chatapp.Controllers.WebsocketController;
 import com.chatapp.Message.GsonMapper;
 import com.chatapp.Message.Protocol;
 import com.chatapp.Services.AuthService;
+import com.chatapp.Services.ISessionHandler;
+import com.chatapp.Tokens.IKeyValuePair;
+import com.chatapp.Tokens.UserToken;
 
 import io.javalin.Javalin;
 
@@ -32,46 +35,46 @@ public class App
     {
         System.out.println( "Hello World!" );
 
-            var sessionHandler = new ISessionContainer() {
+            ConcurrentHashMap<String,UserToken> sessionIds = new ConcurrentHashMap<String,UserToken>();
+            var sessionHandler = new ISessionHandler() {
 
                 @Override
-                public void addSession(KeyValuePair keyValuePair) {
-                    // TODO Auto-generated method stub
-                   // throw new UnsupportedOperationException("Unimplemented method 'addSession'");
+                public void addSession(IKeyValuePair<String,UserToken> keyValuePair) {
+                    sessionIds.put(keyValuePair.getKey(),keyValuePair.getValue());
                 }
 
                 @Override
                 public boolean conatinsSession(String sessionId) {
-                    // TODO Auto-generated method stub
-                    //throw new UnsupportedOperationException("Unimplemented method 'conatinsSession'");
-                    return false;
+                    return sessionIds.containsKey(sessionId);
                 }
 
                 @Override
                 public boolean removeSession(String sessionID) {
-                    // TODO Auto-generated method stub
-                    //throw new UnsupportedOperationException("Unimplemented method 'removeSession'");
-                    return true;
+                    return sessionIds.remove(sessionID) != null;
                 }
                 
             };
 
-            var authService = new AuthService(Algorithm.HMAC256("TestSecret"));
+            var authService = new AuthService(Algorithm.HMAC256(/*Needs to be put into a variable */ "TestSecret"));
 
             var restController = new RestController(authService,sessionHandler);
 
+            var websocketController = new WebsocketController();
+
+            websocketController.setSessionHandler(sessionHandler);
+
             var app = Javalin.create(config -> config.jsonMapper(new GsonMapper()))
             .get("/", ctx -> ctx.result(" Hello World"))
+            /* entpoint for user to get a session ID token for beservice path */
             .post("/user",restController::postUser)
             .start(7070);
 
             app.ws("/chat/{id}",websocket -> {
-                websocket.onConnect(WebsocketController::addUser);
-                websocket.onClose(WebsocketController::removeUser);
+                websocket.onConnect(websocketController::connectUser);
+                websocket.onClose(websocketController::disconnectUser);
                 websocket.onMessage(ctx -> {
                     Protocol protocol = ctx.messageAsClass(Protocol.class);
                     System.out.println("message : " + protocol.toString());
-                    //broadcastMessage(activeUsernameMap.get(ctx), ctx.message());
                 });
             });
 

@@ -1,6 +1,6 @@
 package com.chatapp.Tokens;
 
-public class WbeSocketToken {
+public class WbeSocketToken  {
     public final String sessionID;
     public final String issued;
     public final String validUntil;
@@ -10,7 +10,5 @@ public class WbeSocketToken {
         this.issued = issued;
         this.validUntil = validUntil;
     }
-
-
     
 }

@@ -1,5 +1,7 @@
 package com.chatapp.Message;
 
+import com.chatapp.Tokens.UserToken;
+
 /*
  {
     "version":"",
@@ -17,7 +19,7 @@ package com.chatapp.Message;
 public class Protocol{
     public  String version;
     public  String fromID;
-    public  SenderToken token;
+    public  UserToken token;
     public  String groupId;
     public  String UssrID;
     public  String messageType;
@@ -26,7 +28,7 @@ public class Protocol{
     public  int length;
     public  String data;
 
-    public Protocol(String version, String fromID, SenderToken token, String groupId, String ussrID, String messageType,
+    public Protocol(String version, String fromID, UserToken token, String groupId, String ussrID, String messageType,
             String encoding, String encryption, int length,String data) {
         this.version = version;
         this.fromID = fromID;
@@ -56,11 +58,11 @@ public class Protocol{
         this.fromID = fromID;
     }
 
-    public SenderToken getToken() {
+    public UserToken getToken() {
         return token;
     }
 
-    public void setToken(SenderToken token) {
+    public void setToken(UserToken token) {
         this.token = token;
     }
 
