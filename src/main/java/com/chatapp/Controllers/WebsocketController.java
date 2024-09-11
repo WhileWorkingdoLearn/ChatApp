@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.chatapp.User;
 import com.chatapp.Message.Protocol;
-import com.chatapp.Services.IWebSocketSessionIDValidator;
+import com.chatapp.Services.IValidateItem;
 
 
 
@@ -19,9 +19,9 @@ public class WebsocketController {
 
     private  final Map<WsContext,User> activeUsernameMap = new ConcurrentHashMap<>();
 
-    private IWebSocketSessionIDValidator sessionHandler;
+    private IValidateItem<String> sessionHandler;
 
-    public void setSessionHandler(IWebSocketSessionIDValidator handler){
+    public void setSessionHandler(IValidateItem<String> handler){
         this.sessionHandler = handler;
     }
 

@@ -8,8 +8,9 @@ import kotlin.NotImplementedError;
 import java.lang.IllegalArgumentException;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.chatapp.Controllers.Cache.ICacheController;
 import com.chatapp.Services.IAuthService;
-import com.chatapp.Services.ISessionController;
+import com.chatapp.Tokens.WSToken;
 
 import java.util.Optional;
 
@@ -19,9 +20,9 @@ public class RestController {
 
     private final IAuthService authService;
 
-    private final ISessionController sessionController;
+    private final ICacheController<WSToken> sessionController;
 
-    public RestController(IAuthService authService,ISessionController sessionController){
+    public RestController(IAuthService authService,ICacheController<WSToken> sessionController){
         if(authService == null) throw new IllegalArgumentException("authService needs to be defined");
        
         if(sessionController == null) throw new IllegalArgumentException("sessionContainer needs to be defined");
@@ -46,7 +47,7 @@ public class RestController {
             var userRole = decodedJWT.get().getClaim("role").asString();
 
             if(/*check if user is valid */true){
-                ctx.status(200).json(sessionController.generateWebsocketToken());
+                ctx.status(200).json(sessionController.createItem());
             }
         }
     }

@@ -1,13 +1,15 @@
 package com.chatapp;
 
+import java.time.LocalDateTime;
+
 import com.auth0.jwt.algorithms.Algorithm;
 import com.chatapp.Controllers.RestController;
-import com.chatapp.Controllers.WebSocketSessionIDController;
 import com.chatapp.Controllers.WebsocketController;
+import com.chatapp.Controllers.Cache.AChacheManager;
+import com.chatapp.Controllers.Cache.WSCacheManagerImpl;
 import com.chatapp.Message.GsonMapper;
 import com.chatapp.Services.AuthService;
-
-
+import com.chatapp.Tokens.WSToken;
 
 import io.javalin.Javalin;
 
@@ -34,11 +36,15 @@ public class App
     {
         System.out.println( "Hello World!" );
         
-            /*This needs to be replaced by a session container with background working thread. Invalid tokens needs to be deleted. 
-            Also protection against token spaming is needed.
+            /*This is session container cache with background working thread. Invalid tokens are deleted-> passed time. 
+            A limit against token spaming is needed.
             Further design question is, to allow to have a user multiple Websocket sessions. -> multiple clients at the same time etc.
             */
-            WebSocketSessionIDController wsSessionIDController = new WebSocketSessionIDController();
+            AChacheManager<String,WSToken> wsSessionIDController = new WSCacheManagerImpl((userToken)-> { 
+                var tokenDateTime = LocalDateTime.parse(userToken.validUntil);
+                var currentDateTime = LocalDateTime.now();
+                return  tokenDateTime.isBefore(currentDateTime);
+                },5);
 
             wsSessionIDController.startController();
 
