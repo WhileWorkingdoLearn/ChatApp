@@ -32,10 +32,10 @@ public abstract class ACacheController<Key,Value> implements ICacheController<Va
 
     private final long interval;
 
-    public ACacheController(Function<Value,Boolean> clearCallBack,long interval){
+    public ACacheController(Function<Value,Boolean> clearCallBack,long interval,ConcurrentHashMap<Key,Value> sessionContainer){
         this.clearCallBack = clearCallBack == null ? (value) -> true : clearCallBack;
         this.interval = interval;
-        sessionContainer = new ConcurrentHashMap<>();
+        this.sessionContainer = sessionContainer;
         timer = new Timer();
         this.isActive = false;    
     }

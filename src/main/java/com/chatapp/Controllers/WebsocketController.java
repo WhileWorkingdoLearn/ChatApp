@@ -26,6 +26,10 @@ public class WebsocketController {
     }
 
     public void connectUser(WsConnectContext ctx){
+        /*
+         * 1. Validate SessionId
+         * 2. Save User Session 
+         */
         var value =ctx.pathParam("id");
             if(value.length() > 0 && sessionHandler.isValidWsSessionID(value)){                
                 //activeUsernameMap.put(ctx, new User(null, null, null,null,false));
@@ -38,6 +42,13 @@ public class WebsocketController {
     }
 
     public void handleMessage(WsMessageContext mctx){
+                /*
+                1.decryptMessage
+                2.validateMessageSender
+                3. validateMessageReceiver
+                4. send Message to Receiver
+                 */
+                
             Protocol protocol = mctx.messageAsClass(Protocol.class);
             System.out.println("message : " + protocol.toString());
 
